@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NPS Calculator</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 600px;
+      margin: 50px auto;
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    label, input {
+      display: block;
+      margin-bottom: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    .result {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>NPS Retirement Calculator</h2>
+
+  <label>Monthly Investment (₹):
+    <input type="number" id="monthly" value="1000">
+  </label>
+
+  <label>Expected Annual Return (%):
+    <input type="number" id="rate" value="10">
+  </label>
+
+  <label>Investment Duration (Years):
+    <input type="number" id="years" value="35">
+  </label>
+
+  <button onclick="calculateNPS()">Calculate</button>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    function calculateNPS() {
+      const P = parseFloat(document.getElementById("monthly").value);
+      const rate = parseFloat(document.getElementById("rate").value);
+      const years = parseFloat(document.getElementById("years").value);
+
+      const r = rate / 12 / 100;
+      const n = years * 12;
+
+      const FV = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+      const invested = P * n;
+      const lumpSum = FV * 0.6;
+      const annuity = FV * 0.4;
+
+      document.getElementById("output").innerHTML = `
+        <p><strong>Total Invested:</strong> ₹${invested.toFixed(0)}</p>
+        <p><strong>Maturity Value:</strong> ₹${FV.toFixed(0)}</p>
+        <p><strong>Lump Sum (60%):</strong> ₹${lumpSum.toFixed(0)}</p>
+        <p><strong>Annuity (40%):</strong> ₹${annuity.toFixed(0)}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>

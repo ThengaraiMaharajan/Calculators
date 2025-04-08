@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Step-Up Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body { padding: 2rem; background-color: #f4f4f4; }
+    table { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mb-4 text-center">Step-Up Investment Calculator</h2>
+    
+    <form id="stepUpForm" class="row g-3">
+      <div class="col-md-3">
+        <label for="amount" class="form-label">Initial Amount (₹)</label>
+        <input type="number" class="form-control" id="amount" required />
+      </div>
+      <div class="col-md-3">
+        <label for="years" class="form-label">Number of Years</label>
+        <input type="number" class="form-control" id="years" required />
+      </div>
+      <div class="col-md-3">
+        <label for="duration" class="form-label">Step-Up Duration (Months)</label>
+        <input type="number" class="form-control" id="duration" required />
+      </div>
+      <div class="col-md-3">
+        <label for="step" class="form-label">Step-Up Value (₹)</label>
+        <input type="number" class="form-control" id="step" required />
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary mt-3">Calculate</button>
+      </div>
+    </form>
+
+    <div id="result" class="mt-5"></div>
+  </div>
+
+  <script>
+    document.getElementById('stepUpForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const amount = parseFloat(document.getElementById('amount').value);
+      const years = parseInt(document.getElementById('years').value);
+      const duration = parseInt(document.getElementById('duration').value);
+      const step = parseFloat(document.getElementById('step').value);
+
+      let totalMonths = years * 12;
+      let currentAmount = amount;
+      let cumulative = 0;
+      let currentDate = new Date();
+      let tableHTML = `
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Sr No</th>
+              <th>Month-Year</th>
+              <th>Investment Amount (₹)</th>
+              <th>Cumulative Investment (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (let i = 1; i <= totalMonths; i++) {
+        if ((i - 1) % duration === 0 && i !== 1) {
+          currentAmount += step;
+        }
+
+        cumulative += currentAmount;
+
+        let monthYear = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+        tableHTML += `
+          <tr>
+            <td>${i}</td>
+            <td>${monthYear}</td>
+            <td>₹${currentAmount.toFixed(2)}</td>
+            <td>₹${cumulative.toFixed(2)}</td>
+          </tr>
+        `;
+
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+
+      tableHTML += '</tbody></table>';
+      document.getElementById('result').innerHTML = tableHTML;
+    });
+  </script>
+</body>
+</html>
