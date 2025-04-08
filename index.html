@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Financial Calculators Suite</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f8fa;
+      padding: 40px;
+    }
+    .card {
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1 class="mb-5">📊 Financial Calculators</h1>
+    <div class="row g-4">
+      
+      <div class="col-md-6 col-lg-3">
+        <a href="stepup-calculator.html" class="text-decoration-none">
+          <div class="card p-4 h-100 border-primary">
+            <h5 class="text-primary">Step-Up Investment</h5>
+            <p>View your monthly investment growth with step-ups over time.</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <a href="stepup-interest.html" class="text-decoration-none">
+          <div class="card p-4 h-100 border-success">
+            <h5 class="text-success">Step-Up + Interest (RD/SIP)</h5>
+            <p>Get maturity value and interest for RD/SIP-style step-up investing.</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <a href="nps-calculator.html" class="text-decoration-none">
+          <div class="card p-4 h-100 border-warning">
+            <h5 class="text-warning">Step-Up NPS</h5>
+            <p>Simulate long-term NPS growth, annuity split, and pension estimates.</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <a href="epf-eps-calculator.html" class="text-decoration-none">
+          <div class="card p-4 h-100 border-danger">
+            <h5 class="text-danger">EPF + EPS Pension</h5>
+            <p>Track EPF balance, employer contribution, and EPS pension benefits.</p>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

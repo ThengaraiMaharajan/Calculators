@@ -1,79 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>NPS Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Step-Up NPS Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
-    body {
-      font-family: Arial;
-      max-width: 600px;
-      margin: 50px auto;
-      background: #f0f0f0;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    label, input {
-      display: block;
-      margin-bottom: 10px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-    }
-    h2 {
-      color: #2c3e50;
-    }
-    .result {
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
+    body { padding: 2rem; background-color: #f5f8fa; }
+    table { margin-top: 2rem; }
+    .card p { margin-bottom: 0.4rem; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2 class="mb-4 text-center">Step-Up NPS Calculator</h2>
+    
+    <form id="npsForm" class="row g-3">
+      <div class="col-md-2">
+        <label class="form-label">Initial Amount (₹)</label>
+        <input type="number" class="form-control" id="amount" required />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Number of Years</label>
+        <input type="number" class="form-control" id="years" required />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Step-Up Duration (Months)</label>
+        <input type="number" class="form-control" id="duration" required />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Step-Up Value (₹)</label>
+        <input type="number" class="form-control" id="step" required />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Interest Rate (% p.a.)</label>
+        <input type="number" class="form-control" id="roi" required />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Annuity % at Retirement</label>
+        <input type="number" class="form-control" id="annuityPercent" value="40" />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Annuity Return Rate (%)</label>
+        <input type="number" class="form-control" id="annuityRate" value="6.8" />
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-success mt-3">Calculate</button>
+      </div>
+    </form>
 
-  <h2>NPS Retirement Calculator</h2>
-
-  <label>Monthly Investment (₹):
-    <input type="number" id="monthly" value="1000">
-  </label>
-
-  <label>Expected Annual Return (%):
-    <input type="number" id="rate" value="10">
-  </label>
-
-  <label>Investment Duration (Years):
-    <input type="number" id="years" value="35">
-  </label>
-
-  <button onclick="calculateNPS()">Calculate</button>
-
-  <div class="result" id="output"></div>
+    <div id="result" class="mt-5"></div>
+    <div id="summary" class="mt-4"></div>
+  </div>
 
   <script>
-    function calculateNPS() {
-      const P = parseFloat(document.getElementById("monthly").value);
-      const rate = parseFloat(document.getElementById("rate").value);
-      const years = parseFloat(document.getElementById("years").value);
+    document.getElementById('npsForm').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-      const r = rate / 12 / 100;
-      const n = years * 12;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const years = parseInt(document.getElementById('years').value);
+      const duration = parseInt(document.getElementById('duration').value);
+      const step = parseFloat(document.getElementById('step').value);
+      const roi = parseFloat(document.getElementById('roi').value);
+      const annuityPercent = parseFloat(document.getElementById('annuityPercent').value || 40);
+      const annuityRate = parseFloat(document.getElementById('annuityRate').value || 6.8);
 
-      const FV = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-      const invested = P * n;
-      const lumpSum = FV * 0.6;
-      const annuity = FV * 0.4;
+      let totalMonths = years * 12;
+      let currentAmount = amount;
+      let cumulativeInvestment = 0;
+      let currentDate = new Date();
+      let investmentArray = [];
 
-      document.getElementById("output").innerHTML = `
-        <p><strong>Total Invested:</strong> ₹${invested.toFixed(0)}</p>
-        <p><strong>Maturity Value:</strong> ₹${FV.toFixed(0)}</p>
-        <p><strong>Lump Sum (60%):</strong> ₹${lumpSum.toFixed(0)}</p>
-        <p><strong>Annuity (40%):</strong> ₹${annuity.toFixed(0)}</p>
+      let tableHTML = `
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Sr No</th>
+              <th>Month-Year</th>
+              <th>Investment Amount (₹)</th>
+              <th>Cumulative Investment (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
       `;
-    }
-  </script>
 
+      for (let i = 1; i <= totalMonths; i++) {
+        if ((i - 1) % duration === 0 && i !== 1) {
+          currentAmount += step;
+        }
+
+        cumulativeInvestment += currentAmount;
+        investmentArray.push({ month: i, amount: currentAmount });
+
+        let monthYear = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+        tableHTML += `
+          <tr>
+            <td>${i}</td>
+            <td>${monthYear}</td>
+            <td>₹${currentAmount.toFixed(2)}</td>
+            <td>₹${cumulativeInvestment.toFixed(2)}</td>
+          </tr>
+        `;
+
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+
+      tableHTML += '</tbody></table>';
+      document.getElementById('result').innerHTML = tableHTML;
+
+      // Maturity calculation with monthly compounding
+      const monthlyRate = roi / 100 / 12;
+      let maturityAmount = 0;
+
+      investmentArray.forEach(entry => {
+        let monthsLeft = totalMonths - entry.month + 1;
+        maturityAmount += entry.amount * Math.pow(1 + monthlyRate, monthsLeft);
+      });
+
+      let totalInterest = maturityAmount - cumulativeInvestment;
+
+      // NPS corpus breakdown
+      const annuityAmount = (annuityPercent / 100) * maturityAmount;
+      const lumpSum = maturityAmount - annuityAmount;
+      const monthlyPension = (annuityAmount * (annuityRate / 100)) / 12;
+
+      document.getElementById('summary').innerHTML = `
+        <div class="card p-4 bg-light border border-success">
+          <h5 class="mb-3">NPS Summary:</h5>
+          <p><strong>Total Investment:</strong> ₹${cumulativeInvestment.toFixed(2)}</p>
+          <p><strong>Estimated Interest Earned:</strong> ₹${totalInterest.toFixed(2)}</p>
+          <p><strong>Maturity Amount (Corpus):</strong> ₹${maturityAmount.toFixed(2)}</p>
+          <hr>
+          <p><strong>Lump Sum Withdrawal (₹):</strong> ₹${lumpSum.toFixed(2)}</p>
+          <p><strong>Annuity Purchase (₹):</strong> ₹${annuityAmount.toFixed(2)} (${annuityPercent}%)</p>
+          <p><strong>Estimated Monthly Pension:</strong> ₹${monthlyPension.toFixed(2)}</p>
+        </div>
+      `;
+    });
+  </script>
 </body>
 </html>
