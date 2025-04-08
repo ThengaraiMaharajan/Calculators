@@ -7,6 +7,7 @@
   <style>
     body {
       padding: 30px;
+      background-color: #f4f4f4;
     }
     .table-container {
       max-height: 500px;
@@ -19,6 +20,26 @@
   </style>
 </head>
 <body>
+
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">🧮 Financial Suite</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="stepup-calculator.html">Step-Up</a></li>
+          <li class="nav-item"><a class="nav-link" href="stepup-interest.html">Step-Up RD/SIP</a></li>
+          <li class="nav-item"><a class="nav-link" href="nps-calculator.html">Step-Up NPS</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="epf-eps-calculator.html">EPF + EPS</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
   <div class="container">
     <h2 class="mb-4">EPF + EPS Pension Calculator</h2>
 
@@ -58,12 +79,16 @@
 
     <div class="summary-box">
       <h4>Summary</h4>
-      <ul class="list-group" id="summaryList">
-        <!-- Summary will be populated here -->
-      </ul>
+      <ul class="list-group" id="summaryList"></ul>
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    Simple Web Project
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.getElementById('epfForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -71,13 +96,13 @@
       const basicInput = parseFloat(document.getElementById('basicPay').value);
       const years = parseInt(document.getElementById('duration').value);
       const stepUp = parseFloat(document.getElementById('stepUp').value);
-      const interestRate = 8.15; // annual
+      const interestRate = 8.15;
       const monthlyRate = interestRate / 12 / 100;
 
       const tbody = document.querySelector('#resultTable tbody');
       tbody.innerHTML = '';
 
-      const epsList = []; // Store EPS contributions for last 5 years
+      const epsList = [];
       let balance = 0;
       let interestAccrued = 0;
       let basic = basicInput;
@@ -87,14 +112,10 @@
           const emp = basic * 0.12;
           const employerEPF = basic * 0.0367;
           const employerEPS = basic * 0.0833;
-          const monthlyContribution = emp + employerEPF;
-
-          // Interest is only on previous balance
           const interest = balance * monthlyRate;
           interestAccrued += interest;
           balance += emp + employerEPF + interest;
 
-          // Track EPS for pension calculation
           if (y > years - 5) epsList.push(Math.min(basic, 15000));
 
           const row = document.createElement('tr');
@@ -108,16 +129,14 @@
           `;
           tbody.appendChild(row);
         }
-        basic += basic * (stepUp / 100); // Apply annual step-up
+        basic += basic * (stepUp / 100);
       }
 
-      // EPS Calculation
       const avgLast5YearsBasic = epsList.reduce((a, b) => a + b, 0) / epsList.length;
       const pensionableSalary = Math.min(avgLast5YearsBasic, 15000);
-      const pensionableService = Math.floor(years); // Only whole years count
+      const pensionableService = Math.floor(years);
       const monthlyPension = (pensionableSalary * pensionableService) / 70;
 
-      // Summary
       const summaryList = document.getElementById('summaryList');
       summaryList.innerHTML = `
         <li class="list-group-item">Total EPF Corpus (Employee + Employer + Interest): <strong>₹${balance.toFixed(2)}</strong></li>
