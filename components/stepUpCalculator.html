@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Step-Up Calculator</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles.css">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">🧮 Financial Suite</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="./STEPUPCALCULATOR.html">Step-Up</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container flex-grow-1 my-4">
+    <h2 class="mb-4 text-center">Step-Up Investment Calculator</h2>
+
+    <form id="stepUpForm" class="row g-3">
+      <div class="col-md-3">
+        <label for="amount" class="form-label">Initial Amount (₹)</label>
+        <input type="number" class="form-control" id="amount" required />
+      </div>
+      <div class="col-md-3">
+        <label for="years" class="form-label">Number of Years</label>
+        <input type="number" class="form-control" id="years" required />
+      </div>
+      <div class="col-md-3">
+        <label for="duration" class="form-label">Step-Up Duration (Months)</label>
+        <input type="number" class="form-control" id="duration" required />
+      </div>
+      <div class="col-md-3">
+        <label for="step" class="form-label">Step-Up Value (₹)</label>
+        <input type="number" class="form-control" id="step" required />
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary mt-3">Calculate</button>
+      </div>
+      <div class="text-center mt-3">
+        <button id="downloadCSV" class="btn btn-success">Download CSV</button>
+      </div>
+    </form>
+
+    <div id="result" class="mt-5"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-3 mt-auto">
+    Simple Web Project
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Component Logic -->
+  <script src="./stepUpCalculator.js"></script>
+
+</body>
+</html>
