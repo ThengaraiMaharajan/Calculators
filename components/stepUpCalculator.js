@@ -1,86 +1,118 @@
-alert('Step Up Investment Calculator loaded successfully!');
-// elements
+const form = document.getElementById('stepUpForm');
 const downloadCSVBtn = document.getElementById('downloadCSV');
+const downloadPDFBtn = document.getElementById('downloadPDF');
+const resultContainer = document.getElementById('result');
+const loading = document.getElementById('loading');
+
 downloadCSVBtn.style.display = 'none';
+downloadPDFBtn.style.display = 'none';
 
-// calculator for step up investment
-document.getElementById('stepUpForm').addEventListener('submit', function (e) {
-    e.preventDefault();
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!form.checkValidity()) {
+    form.classList.add('was-validated');
+    return;
+  }
 
-    const amount = parseFloat(document.getElementById('amount').value);
-    const years = parseInt(document.getElementById('years').value);
-    const duration = parseInt(document.getElementById('duration').value);
-    const step = parseFloat(document.getElementById('step').value);
+  const amount = parseFloat(document.getElementById('amount').value);
+  const years = parseInt(document.getElementById('years').value);
+  const duration = parseInt(document.getElementById('duration').value);
+  const step = parseFloat(document.getElementById('step').value);
 
-    let totalMonths = years * 12;
-    let currentAmount = amount;
-    let cumulative = 0;
-    let currentDate = new Date();
-    let tableHTML = `
-      <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>Sr No</th>
-            <th>Month-Year</th>
-            <th>Investment Amount (₹)</th>
-            <th>Cumulative Investment (₹)</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+  const totalMonths = years * 12;
+  if (totalMonths <= 0) {
+    resultContainer.innerHTML = `<div class="alert alert-warning">Please enter a valid number of years.</div>`;
+    return;
+  }
 
-    for (let i = 1; i <= totalMonths; i++) {
-        if ((i - 1) % duration === 0 && i !== 1) {
-            currentAmount += step;
-        }
+  let currentAmount = amount;
+  let cumulative = 0;
+  let currentDate = new Date();
 
-        cumulative += currentAmount;
-
-        let monthYear = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
-
-        tableHTML += `
+  let tableHTML = `
+    <div id="exportArea">
+    <table class="table table-bordered table-striped mt-4">
+      <thead class="table-dark">
         <tr>
-          <td>${i}</td>
-          <td>${monthYear}</td>
-          <td>₹${currentAmount.toFixed(2)}</td>
-          <td>₹${cumulative.toFixed(2)}</td>
+          <th scope="col">Sr No</th>
+          <th scope="col">Month-Year</th>
+          <th scope="col">Investment Amount (₹)</th>
+          <th scope="col">Cumulative Investment (₹)</th>
         </tr>
-      `;
+      </thead>
+      <tbody>
+  `;
 
-        currentDate.setMonth(currentDate.getMonth() + 1);
+  loading.style.display = 'block';
+
+  for (let i = 1; i <= totalMonths; i++) {
+    if ((i - 1) % duration === 0 && i !== 1) {
+      currentAmount += step;
     }
 
-    tableHTML += '</tbody></table>';
-    document.getElementById('result').innerHTML = tableHTML;
-    downloadCSVBtn.style.display = 'block';
+    cumulative += currentAmount;
+    const monthYear = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+    tableHTML += `
+      <tr>
+        <td>${i}</td>
+        <td>${monthYear}</td>
+        <td>₹${currentAmount.toFixed(2)}</td>
+        <td>₹${cumulative.toFixed(2)}</td>
+      </tr>
+    `;
+
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+
+  tableHTML += '</tbody></table></div>';
+
+  setTimeout(() => {
+    loading.style.display = 'none';
+    resultContainer.innerHTML = tableHTML;
+    downloadCSVBtn.style.display = 'inline-block';
+    downloadPDFBtn.style.display = 'inline-block';
+  }, 300);
 });
 
-// excel download
-
 function downloadTableAsCSV() {
-    const rows = document.querySelectorAll("table tr");
-    let csv = [];
+  const rows = document.querySelectorAll("table tr");
+  const csv = [];
 
-    rows.forEach(row => {
-        let cols = row.querySelectorAll("th, td");
-        let rowData = Array.from(cols).map(col => `"${col.innerText.trim()}"`);
-        csv.push(rowData.join(","));
-    });
+  rows.forEach(row => {
+    const cols = row.querySelectorAll("th, td");
+    const rowData = Array.from(cols).map(col => `"${col.innerText.trim()}"`);
+    csv.push(rowData.join(","));
+  });
 
-    const BOM = '\uFEFF'; // Fix for ₹ symbol
-    const blob = new Blob([BOM + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "stepup-investment.csv";
-    a.click();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "stepup-investment.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-    window.URL.revokeObjectURL(url);
+function downloadPDF() {
+  const element = document.getElementById('exportArea');
+  const options = {
+    filename: 'stepup-investment.pdf',
+    margin: 0.3,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(options).from(element).save();
 }
 
 document.addEventListener('click', function (e) {
-    if (e.target && e.target.id === 'downloadCSV') {
-        downloadTableAsCSV();
-    }
+  if (e.target && e.target.id === 'downloadCSV') {
+    downloadTableAsCSV();
+  }
+  if (e.target && e.target.id === 'downloadPDF') {
+    downloadPDF();
+  }
 });
